@@ -1,6 +1,15 @@
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 
-export default function BinanceTicker({ symbol = "btcusdt" }) {
+export default function BinanceTicker({
+  symbol,
+  setCurrentPriceCrypto,
+  currentPriceCrypto,
+}: {
+  symbol: string;
+  setCurrentPriceCrypto: Dispatch<SetStateAction<string[]>>;
+  currentPriceCrypto: Array<string>;
+}) {
   const streamUrl = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@trade`;
 
   const { lastMessage, readyState } = useWebSocket(streamUrl, {
@@ -10,6 +19,18 @@ export default function BinanceTicker({ symbol = "btcusdt" }) {
   });
 
   const price = lastMessage ? JSON.parse(lastMessage.data).p : null;
+
+  useEffect(() => {
+    if (price && currentPriceCrypto.length < 5) {
+      setCurrentPriceCrypto((prev) => {
+        if (prev.length < 5) {
+          return [...prev, price];
+        }
+        CloseEvent;
+        return prev;
+      });
+    }
+  }, [price]);
 
   return (
     <div>
@@ -21,5 +42,3 @@ export default function BinanceTicker({ symbol = "btcusdt" }) {
     </div>
   );
 }
-
-

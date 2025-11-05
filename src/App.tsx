@@ -1,14 +1,17 @@
-import { useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import BinanceTicker from "./components/bin/binance-ticker";
 import { binarySymbols } from "./components/constant/binance";
 import SelectOption from "./components/drop-down";
 import Header from "./components/layout/header";
 import { initialParams } from "./components/link/params";
-import CryptoCalculator from "./components/bin/crypto-calculator";
+import CryptoCalculator from "./components/bin/profit-calculator";
 
 export default function App() {
   const [params, setParams] = useState<null | string>("");
   const [isPending, startTransition] = useTransition();
+  const [currentPriceCrypto, setCurrentPriceCrypto] = useState<Array<string>>(
+    []
+  );
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     startTransition(function () {
@@ -23,7 +26,13 @@ export default function App() {
   return (
     <main>
       <Header />
-      {params && <BinanceTicker symbol={params} />}
+      {params && (
+        <BinanceTicker
+          currentPriceCrypto={currentPriceCrypto}
+          setCurrentPriceCrypto={setCurrentPriceCrypto}
+          symbol={params}
+        />
+      )}
       <SelectOption
         handleChange={handleChange}
         defaultValue={initialParams.get("binary_select") || ""}
@@ -31,7 +40,7 @@ export default function App() {
         name="Select binary"
         disabled={isPending}
       />
-      <CryptoCalculator />
+      <CryptoCalculator currentPriceCrypto={currentPriceCrypto} />
     </main>
   );
 }
